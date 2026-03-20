@@ -1628,7 +1628,7 @@ async function parseLootText(){
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':localStorage.getItem('anthropic_key')||'','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-5',
+        model:'claude-haiku-4-5-20251001',
         max_tokens:1000,
         system:(()=>{const knownItems=(db().it||[]).filter(x=>x.val>0).map(x=>`"${x.name}":${x.val}`).join(', ');return`You are a game loot parser for PokeXGames (a Brazilian Pokemon MMORPG). Extract item names and quantities from game loot text, and suggest a market price for each item. Currency scale: 1 K = 1000 dollars, 1 KK = 1000000 dollars. Return prices in raw dollars (e.g. 5000000 for 5 KK, 500000 for 500 K).
 Known item prices (use these exactly when the item name matches): {${knownItems}}
@@ -1676,7 +1676,7 @@ async function parseLootImage(){
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':localStorage.getItem('anthropic_key')||'','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-5',
+        model:'claude-haiku-4-5-20251001',
         max_tokens:1000,
         system:(()=>{const knownItems=(db().it||[]).filter(x=>x.val>0).map(x=>`"${x.name}":${x.val}`).join(', ');return`You are a game loot parser for PokeXGames (a Brazilian Pokemon MMORPG). Look at the screenshot and extract all item names and quantities, and suggest a market price for each item in raw dollars (1 K = 1000 dollars, 1 KK = 1000000 dollars).
 Known item prices (use these exactly when the item name matches): {${knownItems}}
