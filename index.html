@@ -933,7 +933,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 6px;">Itens identificados pela IA:</div>
       <div id="parse-result-list" class="parse-result"></div>
       <div style="font-size:11px;color:var(--t3);margin-top:8px;">Adicione ou ajuste itens manualmente:</div>
-      <textarea id="loot-extra" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:8px;color:var(--text);font-size:12px;outline:none;resize:vertical;min-height:42px;margin-top:5px;" placeholder="Itens extras, ex: 1x Token Raro" oninput="document.getElementById('confirm-loot-btn').disabled=!(this.value.trim()||parsedLoot.length);"></textarea>
+      <textarea id="loot-extra" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:8px;color:var(--text);font-size:12px;outline:none;resize:vertical;min-height:42px;margin-top:5px;" placeholder="Itens extras, ex: 1x Token Raro"></textarea>
     </div>
 
     <div class="mac">
@@ -1593,7 +1593,7 @@ function openLoot(cn,k,tp,lb){
   document.getElementById('file-input').value='';
   // Pre-fill existing drops
   const existing=ses[cn+'|'+k]?.dr||pdropWeek(cn,k)||'';
-  if(existing){document.getElementById('loot-extra').value=existing;showResult([],existing);document.getElementById('confirm-loot-btn').disabled=false;}
+  if(existing){document.getElementById('loot-extra').value=existing;showResult([],existing);}
   switchLootTab('text',document.querySelector('.ltab.on'));
   document.getElementById('lmo').classList.add('open');
 }
@@ -1613,9 +1613,9 @@ async function parseLootText(){
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
+        model:'claude-sonnet-4-5',
         max_tokens:1000,
         system:(()=>{const knownItems=(db().it||[]).filter(x=>x.val>0).map(x=>`"${x.name}":${x.val}`).join(', ');return`You are a game loot parser for PokeXGames (a Brazilian Pokemon MMORPG). Extract item names and quantities from game loot text, and suggest a market price for each item. Currency scale: 1 K = 1000 dollars, 1 KK = 1000000 dollars. Return prices in raw dollars (e.g. 5000000 for 5 KK, 500000 for 500 K).
 Known item prices (use these exactly when the item name matches): {${knownItems}}
@@ -1661,9 +1661,9 @@ async function parseLootImage(){
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
+        model:'claude-sonnet-4-5',
         max_tokens:1000,
         system:(()=>{const knownItems=(db().it||[]).filter(x=>x.val>0).map(x=>`"${x.name}":${x.val}`).join(', ');return`You are a game loot parser for PokeXGames (a Brazilian Pokemon MMORPG). Look at the screenshot and extract all item names and quantities, and suggest a market price for each item in raw dollars (1 K = 1000 dollars, 1 KK = 1000000 dollars).
 Known item prices (use these exactly when the item name matches): {${knownItems}}
