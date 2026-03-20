@@ -933,7 +933,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 6px;">Itens identificados pela IA:</div>
       <div id="parse-result-list" class="parse-result"></div>
       <div style="font-size:11px;color:var(--t3);margin-top:8px;">Adicione ou ajuste itens manualmente:</div>
-      <textarea id="loot-extra" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:8px;color:var(--text);font-size:12px;outline:none;resize:vertical;min-height:42px;margin-top:5px;" placeholder="Itens extras, ex: 1x Token Raro"></textarea>
+      <textarea id="loot-extra" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:8px;color:var(--text);font-size:12px;outline:none;resize:vertical;min-height:42px;margin-top:5px;" placeholder="Itens extras, ex: 1x Token Raro" oninput="document.getElementById('confirm-loot-btn').disabled=!(this.value.trim()||parsedLoot.length);"></textarea>
     </div>
 
     <div class="mac">
@@ -1593,7 +1593,7 @@ function openLoot(cn,k,tp,lb){
   document.getElementById('file-input').value='';
   // Pre-fill existing drops
   const existing=ses[cn+'|'+k]?.dr||pdropWeek(cn,k)||'';
-  if(existing){document.getElementById('loot-extra').value=existing;showResult([],existing);}
+  if(existing){document.getElementById('loot-extra').value=existing;showResult([],existing);document.getElementById('confirm-loot-btn').disabled=false;}
   switchLootTab('text',document.querySelector('.ltab.on'));
   document.getElementById('lmo').classList.add('open');
 }
