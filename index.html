@@ -1624,49 +1624,35 @@ async function parseLootText(){
   if(!text){toast('⚠️ Cole o texto do loot!',true);return;}
   showLoading();
   try{
+    const knownItems=(db().it||[]).filter(x=>x.val>0).map(x=>`"${x.name}":${x.val}`).join(', ');
+    const sysPrompt=`You are a game loot parser for PokeXGames (a Brazilian Pokemon MMORPG). Extract item names and quantities from game loot text, and suggest a market price for each item. Currency scale: 1 K = 1000 dollars, 1 KK = 1000000 dollars. Return prices in raw dollars (e.g. 5000000 for 5 KK, 500000 for 500 K).\nKnown item prices (use these exactly when the item name matches): {${knownItems}}\nReturn ONLY a JSON array like: [{"name":"Item Name","qty":2,"price":5000000},{"name":"Other Item","qty":1,"price":500000}]\nIf unsure of price, use 0. No markdown, no explanation, just the JSON array. If no items found, return [].`;
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':localStorage.getItem('anthropic_key')||'','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':localStorage.getItem('anthropic_key')||'',
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
       body:JSON.stringify({
         model:'claude-haiku-4-5-20251001',
         max_tokens:1000,
-        system:(()=>{const knownItems=(db().it||[]).filter(x=>x.val>0).map(x=>`"${x.name}":${x.val}`).join(', ');return`You are a game loot parser for PokeXGames (a Brazilian Pokemon MMORPG). Extract item names and quantities from game loot text, and suggest a market price for each item. Currency scale: 1 K = 1000 dollars, 1 KK = 1000000 dollars. Return prices in raw dollars (e.g. 5000000 for 5 KK, 500000 for 500 K).
-Known item prices (use these exactly when the item name matches): {${knownItems}}
-Return ONLY a JSON array like: [{"name":"Item Name","qty":2,"price":5000000},{"name":"Other Item","qty":1,"price":500000}]
-If unsure of price, use 0. No markdown, no explanation, just the JSON array. If no items found, return [].`;})(),
+        system:sysPrompt,
         messages:[{role:'user',content:`Parse this loot text, extract items/quantities, suggest prices in dollars (1K=1000, 1KK=1000000):\n\n${text}`}]
       })
     });
     const data=await res.json();
+    if(data.error){throw new Error(data.error.message);}
     const raw=data.content?.[0]?.text||'[]';
     const items=JSON.parse(raw.replace(/```json|```/g,'').trim());
     parsedLoot=items;
     showResult(items,'');
   }catch(e){
+    console.error('Loot parse error:',e);
     document.getElementById('parse-result-area').style.display='block';
-    document.getElementById('parse-result-list').innerHTML=`<div class="parse-error">Erro ao analisar. Cole os itens manualmente abaixo.</div>`;
+    document.getElementById('parse-result-list').innerHTML=`<div class="parse-error">Erro: ${e.message}. Cole os itens manualmente abaixo.</div>`;
     document.getElementById('confirm-loot-btn').disabled=false;
   }
-}
-
-// ── AI PARSE IMAGE ──────────────────────────────────────────────────
-function handleFile(file){
-  if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const b64=e.target.result.split(',')[1];
-    uploadedImageB64=b64;
-    uploadedImageType=file.type;
-    const prev=document.getElementById('upload-preview');
-    prev.src=e.target.result;prev.style.display='block';
-    document.getElementById('upload-hint').style.display='none';
-    document.getElementById('parse-img-btn').disabled=false;
-  };
-  reader.readAsDataURL(file);
-}
-function handleDrop(e){
-  e.preventDefault();document.getElementById('upload-zone').classList.remove('drag');
-  const file=e.dataTransfer.files[0];if(file&&file.type.startsWith('image/'))handleFile(file);
 }
 async function parseLootImage(){
   if(!uploadedImageB64){toast('⚠️ Faça upload de uma imagem!',true);return;}
@@ -5110,3 +5096,4 @@ function silentRefresh(){
 </script>
 </body>
 </html>
+
