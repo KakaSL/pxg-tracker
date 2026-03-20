@@ -244,6 +244,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="err" id="le"></div><br>
       <button class="btn bp" onclick="doLogin()">ENTRAR</button>
       <div class="tc mt">Sem conta? <span class="lnk" onclick="showReg()">Criar conta</span></div>
+      <div style="margin-top:16px;border-top:1px solid #333;padding-top:14px;">
+        <div style="font-size:11px;color:#666;text-align:center;margin-bottom:8px;">🤖 Chave API Anthropic (para análise de loot)</div>
+        <input id="api-key-input" type="password" placeholder="sk-ant-..." style="width:100%;background:#0f1218;border:1px solid #2e3a50;border-radius:9px;padding:9px 12px;color:#e8edf5;font-size:12px;outline:none;margin-bottom:6px;">
+        <button class="btn bs" style="width:100%;font-size:12px;" onclick="saveApiKey()">💾 Salvar Chave</button>
+        <div id="api-key-status" style="font-size:11px;text-align:center;margin-top:4px;color:#4be896;"></div>
+      </div>
       <div style="margin-top:20px;border-top:1px solid #333;padding-top:16px;">
         <div style="font-size:11px;color:#666;text-align:center;margin-bottom:10px;">Migrar dados de outra sessão</div>
         <div style="display:flex;gap:8px;">
@@ -1135,6 +1141,13 @@ function confirmarImport(){
   }
 }
 
+function saveApiKey(){
+  const key=document.getElementById("api-key-input").value.trim();
+  if(!key){document.getElementById("api-key-status").textContent="⚠️ Digite a chave!";return;}
+  localStorage.setItem("anthropic_key",key);
+  document.getElementById("api-key-status").textContent="✅ Chave salva!";
+  document.getElementById("api-key-input").value="";
+}
 function doLogin(){
   const u=document.getElementById('lu').value.trim(),p=document.getElementById('lp').value;
   if(!u||!p){document.getElementById('le').textContent='Preencha tudo.';return;}
